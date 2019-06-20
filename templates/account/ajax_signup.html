@@ -1,0 +1,51 @@
+<form id="signup_form" class="need_auth" method="post" data-next ="{{next_url}}" action="{% url 'account_signup' %}">
+
+    {% csrf_token %}
+    <p><input type="email"
+              name="email"
+              placeholder="E-mail address"
+              id="id_email"
+              required=""
+              autofocus="autofocus"
+              class="form-control">
+    </p>
+    <!-- <p><input type="text"
+                  name="username"
+                  placeholder="User name"
+                  autofocus="autofocus"
+                  minlength="4"
+                  maxlength="150"
+                  required=""
+                  id="id_username"
+                  class="form-control">
+    </p> -->
+    <p><input type="password"
+              name="password1"
+              placeholder="Password"
+              required="" id="id_password1"
+              aria-autocomplete="list"
+              class="form-control">
+    </p>
+    <p><input type="password"
+              name="password2"
+              placeholder="Password (again)"
+              required=""
+              id="id_password2"
+              class="form-control">
+    </p>
+    <p class="er">Er comes ...</p>
+    <!-- {% if form.error_messages %}
+        <ul class="errorlist">
+            <li>form.error_message</li>
+        </ul>
+    {% endif %} -->
+
+    <!-- {% if erorrs %}
+        {{errors}}
+        <ul class="errorlist">
+            <li>Field required.</li>
+        </ul>
+    {% endif %} -->
+
+    <button class="btn btn-primary" type="submit">Sign Up</button>
+</form>

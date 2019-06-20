@@ -23,10 +23,11 @@ class Profile(models.Model):
     state = models.CharField(max_length=124,default="")
     city = models.CharField(max_length=124,default="")
     avatar = models.ImageField(blank=True,null=True,upload_to=make_avatar)
-    
+
 
     def __str__(self):
         return self.user.username
+    @property    
     def get_absolute_url(self):
         return reverse('profiles:profile',kwargs={'pk':self.user_id})
     @property

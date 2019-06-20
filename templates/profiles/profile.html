@@ -1,4 +1,8 @@
 {% include 'basic.html' %}
 {% block content %}
-<h1>Your profile</h1>
+<div class="container">
+    <h1>Welcome, {{user|capfirst}}</h1>
+    <p><img src="{{user.profile.get_ava_path}}" class="rounded-plus" alt="ava"></p>
+
+</div>
 {% endblock %}

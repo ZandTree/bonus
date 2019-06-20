@@ -1,3 +1,6 @@
 body {
     background: #f7efef;
 }
+.rounded-plus{
+    border-radius: 50%;
+}

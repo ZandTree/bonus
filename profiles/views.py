@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.views.generic import View
+from django.views.generic import DetailView
+from .models import Profile
 
-class ProfileView(View):
-    def get(self,request):
-        return render(request,'profiles/profile.html')
+class ProfileView(DetailView):
+    template_name ='profiles/profile.html'
+    model = Profile
