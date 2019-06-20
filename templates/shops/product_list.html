@@ -1,11 +1,11 @@
 {% extends 'basic.html' %}
 {% block content %}
 <h1>List of product</h1>
-{% for p in product_list%}
+{% for prod in product_list%}
 <div class="product">
-    <h4>Name: {{p.name}}</h4>
-    <p><strong>Price: {{p.price}}</strong></p>
-    <form class="" action="#" method="get">
+    <h4>Name: {{prod.name}}</h4>
+    <p><strong>Price: {{prod.price}}</strong></p>
+    <form class="" action="{% url 'shops:add-product' prod.id %}" method="get">
         <button class="btn btn-success">Add To Your Cart</button>
     </form>
     <hr>
