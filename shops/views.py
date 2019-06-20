@@ -39,3 +39,7 @@ class ShowCartItems(LoginRequiredMixin,ListView):
     def get_queryset(self,*args,**kwargs):
         cart = Cart.objects.get(user=self.request.user,accepted=False)
         return cart.product.all()
+
+    # def get(self,request,**kwargs):
+    #     item_id = self.request.GET.get('item_id')
+    #     print(item_id)  

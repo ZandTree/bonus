@@ -3,15 +3,27 @@
 {% block content%}
  <div class="container">
     {% for prod in products %}
-    <div class="product">
+    <div class="on-move-{{prod.id}}">
         <h4>Name: {{prod.name}}</h4>
         <p><strong>Price: {{prod.price}}</strong></p>
-        <form class="" action="{% url 'shops:add-product' prod.id %}" method="get">
-            <button class="btn btn-danger">Remove Item From Cart</button>
-        </form>
+        <a class="remove-item"
+        data-id='{{prod.id}}'
+        href="#">XDeleteX
+        </a>
         <hr>
     </div>
     {% endfor %}
 
 </div>
+<script>
+    $('.remove-item').on('click',function(e){
+        var removeId=$(this).attr('data-id');
+        console.log(removeId);
+        $(".on-move-"+ removeId).css('display','none')
+    })
+
+</script>
 {% endblock %}
+
+
+$(".on-move-"+ removeId).css('display','none')
