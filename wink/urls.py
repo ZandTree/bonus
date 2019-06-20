@@ -25,7 +25,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('',TemplateView.as_view(template_name='basic.html')),
     path('profile/',include('profiles.urls')),
-    #path('',include('carts.urls')),
+    path('shopping/',include('shops.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()

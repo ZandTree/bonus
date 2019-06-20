@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     # custom apps
     'profiles',
-    #'shops',
+    'shops',
     #third parties
     'bootstrap4',
     'allauth',

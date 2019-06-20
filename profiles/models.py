@@ -27,9 +27,9 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-    @property    
+
     def get_absolute_url(self):
-        return reverse('profiles:profile',kwargs={'pk':self.user_id})
+        return reverse('profiles:profile',kwargs={'pk':self.id})
     @property
     def get_ava_path(self,*args,**kwargs):
         if self.avatar:
