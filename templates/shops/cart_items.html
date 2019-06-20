@@ -1,0 +1,17 @@
+{% extends 'basic.html' %}
+{% load static %}
+{% block content%}
+ <div class="container">
+    {% for prod in products %}
+    <div class="product">
+        <h4>Name: {{prod.name}}</h4>
+        <p><strong>Price: {{prod.price}}</strong></p>
+        <form class="" action="{% url 'shops:add-product' prod.id %}" method="get">
+            <button class="btn btn-danger">Remove Item From Cart</button>
+        </form>
+        <hr>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

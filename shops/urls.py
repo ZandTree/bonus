@@ -7,4 +7,5 @@ urlpatterns =[
     path('',views.Home.as_view(),name='home'),
     path('products/',views.Products.as_view(),name='products'),
     path('add-product/<int:pk>/',views.AddProductToCart.as_view(),name='add-product'),
+    path('cart-items/',views.ShowCartItems.as_view(),name='cart-items'),
 ]
