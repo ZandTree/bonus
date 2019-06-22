@@ -10,5 +10,6 @@ urlpatterns =[
     path('cart-items/',views.ShowCartItems.as_view(),name='cart-items'),
     path('order-create/<int:pk>/',views.OrderMake.as_view(),name='order-create'),
     path('orders-list',views.ShowOrders.as_view(),name='orders-list'),
+    path('bonus-cart-info/<int:pk>/',views.ShowBonusCartInfo.as_view(),name='bonuscart-info'),
 
 ]

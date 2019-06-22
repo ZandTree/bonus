@@ -42,13 +42,37 @@ class Order(models.Model):
         return 'Order No {}'.format(self.id)
 
     def get_total(self):
+        """ return sum to pay inclusive discount in decimal format """
         summa = self.cart.get_total()
         discount_price= summa - (summa/100*self.discount)
         # return format(discount_price,".2f")
         return discount_price
 
+
+class BonusCartManager(models.Manager):
+    def get_valid_bonuscart(self,*args,**kwargs):
+        return super().all(*args,**kwargs).filter(valid=True)
+
+    def count_prods_bonus_cart(self,request,valid = False):
+        """ return quntity of prods associated with BonusCart"""
+        user_carts = Cart.objects.filter(user=self.reqest.user)
+        return user_carts.values_list('product',flat=True).count()
+
+    def list_prods_bonus_cart(self,request,valid=True):
+            """
+            return list of products associated with BonusCart
+            """
+            user_carts = Cart.objects.filter(user=self.reqest.user)
+            id_prods_cart = user_carts.values_list('product',flat=True)
+            #'cart_id' into field. Choices are: accepted, id, order, product, user, user_id
+            return Product.obejcts.filter(id__in=[id_prods_cart])
+
+
+
+
 # time = datetime(2010, 6, 21, 19, 31, 50, 894934)
 # time_2 = datetime(2019, 6, 22, 12, 0, 24, 423780, tzinfo=<UTC>)
+
 STATUS = (
     ('valid','valid'),
     ('invalid','invalid')
@@ -63,19 +87,13 @@ class BonusCart(models.Model):
     summ_total = models.DecimalField(max_digits=6,decimal_places=2,default=0)
     expired = models.DateTimeField()
 
+    objects = BonusCartManager()
     def save(self,*args,**kwargs):
         current_date_time = timezone.now()
         if current_date_time > expired:
             self.status = 'invalid'
-        super().save(*args,**kwargs)    
+        super().save(*args,**kwargs)
 
-# option N1
-"""
-при создании юзера создаю бонусную карту с отсут-им unid,
-далее вызываю сигнал (pre_save for BonusCart) и добавляю uid,после чего сохраняю
-object BonusCart
-"""
-"""
 @receiver(post_save,sender = User)
 def create_bounuscart(sender,instance,created,**kwargs):
     #As New User created, create BonusCart
@@ -89,58 +107,6 @@ def bonuscart_presave_receiver(sender, instance,*args,**kwargs):
         instance.uid = create_uid(instance)
         # don't call here save(!)
 pre_save.connect(bonuscart_presave_receiver,sender=BonusCart)
-"""
 
-# option N2 (очень старнный,но всё в одном под присмотром)
-def create_bonus(sender, instance,created,*args,**kwargs):
-    """As New User created, create BonusCart """
-    if created:
-        created = timezone.now()
-        expired = timezone.now() + timedelta(days=180)
-        while True:
-            uid = rand_string(5)
-            print(uid)
-            if BonusCart.objects.filter(uid=uid).exists():
-                continue
-            else:
-                break
-        BonusCart.objects.get_or_create(user=instance,created_at=created,expired=expired,uid=uid)
-post_save.connect(create_bonus,sender=User)
-
-# Option N3 (with error, хотя бонусная карта успешно создаётся вместе с юзером)
-"""
-почему в этой строке кода возикает ошибка: AttributeError: 'RelatedManager' object has no attribute 'save', а в при создании объекта Профиля(см ниже),сопряжённого с созданием юзера,
-этой ошибки не возникает и метод находится?
-line:104 ==> instance.bonus.save()
-"""
-
-# создание бонусной карты,сопряжённой с созданием юзера
-# отношение: User,BonusCart ==> oneToMany
-# @receiver(post_save,sender = User)
-# def create_user_profile(sender,instance,created,**kwargs):
-#     """As New User created, create BonusCart """
-#     if created:
-#         created = timezone.now()
-#         expired = timezone.now() + timedelta(days=180)
-#         bonus= BonusCart.objects.get_or_create(user=instance,created_at=created,expired=expired)
-# def bonuscart_presave_receiver(sender, instance,*args,**kwargs):
-#     if not instance.uid: # if already created => no need to change
-#         instance.uid = create_uid(instance)
-#
-# pre_save.connect(bonuscart_presave_receiver,sender=BonusCart)
-# @receiver(post_save,sender=User)
-# def save_user_bonuscart(sender,instance,**kwargs):
-#     """As New User created, save BonusCart"""
-#     instance.bonus.save() #ОШИБКА
-
-# создание профиля,сопряжённой с созданием юзера
-# отношение:User Profile ==> oneToOne
-# @receiver(post_save,sender = User)
-# def create_user_profile(sender,instance,created,**kwargs):
-#     """As New User created, create Profile"""
-#     if created:
-#         Profile.objects.create(user=instance)#
-# @receiver(post_save,sender=User)
-# def save_user_profile(sender,instance,**kwargs):
-#     """As New User created, save Profile"""
-#     instance.profile.save() # No ERROR
+# AttributeError: 'RelatedManager' object has no attribute 'save',
+#line:104 ==> instance.bonus.save()

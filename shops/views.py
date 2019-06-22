@@ -62,3 +62,6 @@ class ShowOrders(LoginRequiredMixin,ListView):
     model = Order
     def get_queryset(self):
         return Order.objects.filter(cart__user = self.request.user)
+
+class BonusCartInfo(DetailView):
+    model = BonusCart        
