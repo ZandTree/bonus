@@ -1,28 +1,19 @@
 {% extends 'basic.html' %}
 {% load static %}
 {% block content%}
+<p>There {{products.count|pluralize:"is,are"}} {{products.count}} item(s) in your cart</p>
+<p>Total price for items:: {{cart.get_total}}</p>
+<a href="{% url 'shops:order-create' cart.id %}"><button class="btn btn-success">Make Order</button></a>
  <div class="container">
     {% for prod in products %}
     <div class="on-move-{{prod.id}}">
         <h4>Name: {{prod.name}}</h4>
         <p><strong>Price: {{prod.price}}</strong></p>
-        <a class="remove-item"
-        data-id='{{prod.id}}'
-        href="#">XDeleteX
-        </a>
         <hr>
     </div>
     {% endfor %}
 
 </div>
-<script>
-    $('.remove-item').on('click',function(e){
-        var removeId=$(this).attr('data-id');
-        console.log(removeId);
-        $(".on-move-"+ removeId).css('display','none')
-    })
-
-</script>
 {% endblock %}
 
 

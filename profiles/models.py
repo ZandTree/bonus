@@ -38,7 +38,6 @@ class Profile(models.Model):
             return '/static/img/day.jpg/'
 
     def save(self,*args,**kwargs):
-        print('save method profile calling')
         super().save(*args,**kwargs)
         if self.avatar:
             img = Image.open(self.avatar.path)

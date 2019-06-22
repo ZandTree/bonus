@@ -1,6 +1,7 @@
 {% extends 'basic.html' %}
 {% block content %}
 <h1>List of product</h1>
+
 {% for prod in product_list%}
 <div class="product">
     <h4>Name: {{prod.name}}</h4>

@@ -1,13 +1,13 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse_lazy
-from .models import Product,Cart
+from .models import Product,Cart,Order
 from django.views.generic import ListView,View,TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class Home(TemplateView):
     template_name = 'shops/home.html'
 
-class Products(ListView):
+class Products(LoginRequiredMixin,ListView):
     model = Product
     def get_queryset(self,*args,**kwargs):
         """
@@ -16,12 +16,15 @@ class Products(ListView):
         """
         cart = Cart.objects.get(user=self.request.user,accepted=False)
         prods_bought = cart.product.all().values_list('id',flat=True)
-        return Product.objects.exclude(id__in=prods_bought)
+        print("all available products",Product.objects.all())
+        to_see = Product.objects.exclude(id__in=prods_bought)
+        return to_see
+
 
 class AddProductToCart(LoginRequiredMixin,View):
     def get(self,request,pk):
         prod = get_object_or_404(Product,id=pk)
-        cart = Cart.objects.get(user=request.user)
+        cart = Cart.objects.get(user=request.user,accepted=False)
         all_prods = cart.product.all()
         cart.product.add(prod)
         cart.save()
@@ -40,6 +43,22 @@ class ShowCartItems(LoginRequiredMixin,ListView):
         cart = Cart.objects.get(user=self.request.user,accepted=False)
         return cart.product.all()
 
-    # def get(self,request,**kwargs):
-    #     item_id = self.request.GET.get('item_id')
-    #     print(item_id)  
+    def get_context_data(self,*args,**kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cart'] = Cart.objects.get(user=self.request.user,accepted=False)
+        return context
+
+class OrderMake(LoginRequiredMixin,View):
+    def get(self,request,pk):
+        cart = get_object_or_404(Cart,id=pk,accepted=False)
+        order = Order.objects.create(cart=cart)
+        print('order created',order)
+        cart.accepted = True
+        cart.save()
+        new_cart = Cart.objects.create(user=request.user,accepted=False)
+        return redirect ("shops:orders-list")
+
+class ShowOrders(LoginRequiredMixin,ListView):
+    model = Order
+    def get_queryset(self):
+        return Order.objects.filter(cart__user = self.request.user)

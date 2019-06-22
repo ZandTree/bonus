@@ -10,17 +10,17 @@ def rand_string(n):
     final_string = [random.choice(mix) for item in range(n)]
     return "".join(final_string)
 
-def create_profile_uid(instance):
+def create_uid(instance):
     """
     create unique id for instance based on random letters and digits
     which have attr = uid
     """
     klass = instance.__class__
-    start_unid = rand_string(4)
-    if klass.objects.filter(unid=start_unid).exists():
-        instance.unid = rand_string(4)
+    start_uid = rand_string(4)
+    if klass.objects.filter(uid=start_uid).exists():
+        instance.uid = rand_string(4)
         return create_profile_uid(instance)
-    return start_unid
+    return start_uid
 
 def make_avatar(instance,file):
     time = timezone.now().strftime("Y-%m-%d")
@@ -30,4 +30,4 @@ def make_avatar(instance,file):
         head = head[:10]
     file_name = head + '.' + tail
     user_folder = instance.user_id
-    return  os.path.join('avatars',user_folder,file_name)   
+    return  os.path.join('avatars',user_folder,file_name)

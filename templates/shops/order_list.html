@@ -1,0 +1,28 @@
+{% extends 'basic.html' %}
+{% load static %}
+{% block content %}
+<h3>List of Orders for {{user}}</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Created</th>
+      <th scope="col">Discount</th>
+      <th scope="col">Total</th>
+      <th scope="col">Items</th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for order in order_list %}
+    <tr>
+      <th scope="row">{{order.id}}</th>
+      <td>{{order.created_at|date:'d F Y'}}</td>
+      <td>{{order.discount}}</td>
+      <td>{{order.get_total}}</td>
+      <td>{{order.cart.product.all}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
