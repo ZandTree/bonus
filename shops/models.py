@@ -63,6 +63,12 @@ class BonusCart(models.Model):
     summ_total = models.DecimalField(max_digits=6,decimal_places=2,default=0)
     expired = models.DateTimeField()
 
+    def save(self,*args,**kwargs):
+        current_date_time = timezone.now()
+        if current_date_time > expired:
+            self.status = 'invalid'
+        super().save(*args,**kwargs)    
+
 # option N1
 """
 при создании юзера создаю бонусную карту с отсут-им unid,
@@ -120,7 +126,7 @@ line:104 ==> instance.bonus.save()
 # def bonuscart_presave_receiver(sender, instance,*args,**kwargs):
 #     if not instance.uid: # if already created => no need to change
 #         instance.uid = create_uid(instance)
-#         
+#
 # pre_save.connect(bonuscart_presave_receiver,sender=BonusCart)
 # @receiver(post_save,sender=User)
 # def save_user_bonuscart(sender,instance,**kwargs):
