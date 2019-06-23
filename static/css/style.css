@@ -9,3 +9,6 @@ body {
     margin-top: 5rem;
     margin-bottom: 2rem;
 }
+#sio{
+    padding-inline-start:0;
+}

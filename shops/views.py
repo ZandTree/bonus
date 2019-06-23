@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse_lazy
-from .models import Product,Cart,Order
-from django.views.generic import ListView,View,TemplateView
+from .models import Product,Cart,Order,BonusCart
+from django.views.generic import ListView,View,TemplateView,DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
 
 class Home(TemplateView):
     template_name = 'shops/home.html'
@@ -52,8 +53,11 @@ class OrderMake(LoginRequiredMixin,View):
     def get(self,request,pk):
         cart = get_object_or_404(Cart,id=pk,accepted=False)
         order = Order.objects.create(cart=cart)
+        bonus = BonusCart.objects.filter(user=request.user).last()
         print('order created',order)
         cart.accepted = True
+        bonus.last_used = timezone.now()
+        bonus.save()
         cart.save()
         new_cart = Cart.objects.create(user=request.user,accepted=False)
         return redirect ("shops:orders-list")
@@ -63,5 +67,24 @@ class ShowOrders(LoginRequiredMixin,ListView):
     def get_queryset(self):
         return Order.objects.filter(cart__user = self.request.user)
 
-class BonusCartInfo(DetailView):
-    model = BonusCart        
+# class ShowBonusCart(View):
+#     def get(self,request):
+#         user_carts = Cart.objects.filter(user=self.request.user,accepted=True)
+#         id_prods_cart = user_carts.values_list('product',flat=True)
+#         bonus = BonusCart.objects.filter(user=request.user).last()
+#         context = {}
+#         context['bonus'] = bonus
+#         context['count_prods'] = id_prods_cart.count()
+#         context['list_prods'] = Product.objects.filter(id__in=[id_prods_cart])
+#         return render(request,'shops/bonuscart_detail.html',context)
+
+class ShowBonusCart(DetailView):
+    model = BonusCart
+    context_object_name ='bonus'
+    def get_context_data(self,*args,**kwargs):
+        context = super().get_context_data(*args,**kwargs)
+        user_carts = Cart.objects.filter(user=self.request.user,accepted=True)
+        id_prods_cart = user_carts.values_list('product',flat=True)
+        context['count_prods'] = id_prods_cart.count()
+        context['list_prods'] = Product.objects.filter(id__in=[id_prods_cart])
+        return context

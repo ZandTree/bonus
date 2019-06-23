@@ -1,4 +1,5 @@
 from django.db import models
+from django.shortcuts import reverse
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save,pre_save
 from django.db.models import Sum
@@ -52,24 +53,6 @@ class Order(models.Model):
 class BonusCartManager(models.Manager):
     def get_valid_bonuscart(self,*args,**kwargs):
         return super().all(*args,**kwargs).filter(valid=True)
-
-    def count_prods_bonus_cart(self,request,valid = False):
-        """ return quntity of prods associated with BonusCart"""
-        user_carts = Cart.objects.filter(user=self.reqest.user)
-        return user_carts.values_list('product',flat=True).count()
-
-    def list_prods_bonus_cart(self,request,valid=True):
-            """
-            return list of products associated with BonusCart
-            """
-            user_carts = Cart.objects.filter(user=self.reqest.user)
-            id_prods_cart = user_carts.values_list('product',flat=True)
-            #'cart_id' into field. Choices are: accepted, id, order, product, user, user_id
-            return Product.obejcts.filter(id__in=[id_prods_cart])
-
-
-
-
 # time = datetime(2010, 6, 21, 19, 31, 50, 894934)
 # time_2 = datetime(2019, 6, 22, 12, 0, 24, 423780, tzinfo=<UTC>)
 
@@ -78,11 +61,11 @@ STATUS = (
     ('invalid','invalid')
 )
 class BonusCart(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='bonus',blank=True,null=True)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='bonus',blank=True,null=True)
     uid = models.CharField(max_length=4,blank=True,null=True)
     valid = models.BooleanField(default=True)
     created_at = models.DateTimeField()
-    last_used = models.DateTimeField(auto_now=True,blank=True,null=True)
+    last_used = models.DateTimeField(blank=True,null=True)
     status = models.CharField(max_length=7,choices=STATUS,default='valid')
     summ_total = models.DecimalField(max_digits=6,decimal_places=2,default=0)
     expired = models.DateTimeField()
@@ -90,9 +73,14 @@ class BonusCart(models.Model):
     objects = BonusCartManager()
     def save(self,*args,**kwargs):
         current_date_time = timezone.now()
-        if current_date_time > expired:
+        if current_date_time > self.expired:
+            print('check for validity')
             self.status = 'invalid'
         super().save(*args,**kwargs)
+    def __str__(self):
+        return "bonus-cart N {}".format(self.uid)
+    def get_absolute_url(self):
+        return reverse('shops:bonuscart',kwargs={'pk':self.id})
 
 @receiver(post_save,sender = User)
 def create_bounuscart(sender,instance,created,**kwargs):
@@ -100,7 +88,9 @@ def create_bounuscart(sender,instance,created,**kwargs):
     if created:
         created = timezone.now()
         expired = timezone.now() + timedelta(days=180)
+        print(expired)
         bonus= BonusCart.objects.get_or_create(user=instance,created_at=created,expired=expired)
+        # don't use here .save()!
 
 def bonuscart_presave_receiver(sender, instance,*args,**kwargs):
     if not instance.uid: # if already created => no need to change

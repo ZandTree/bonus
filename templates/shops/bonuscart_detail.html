@@ -1,6 +1,22 @@
 {% extends 'basic.html' %}
+{% load static %}
 
-{% block context %}
+{% block content %}
 <h1>Detail about your bonus cart</h1>
-<p>bonus cart:{{object}}</p>
+<p>Owner of the bonus cart:{{bonus.user}}</p>
+<p>Valid:{{bonus.valid}}</p>
+<p>Created at: {{bonus.created_at|date:'d (D) m Y'}}</p>
+<p>Last used:  {{bonus.last_used}}</p>
+<p>Status: <strong>{{bonus.status}}</strong></p>
+
+<p>Sum Total:{{bonus.summ_total}}</p>
+<p>Expired at:{{bonus.expired|date:'d (D) m Y'}}</p>
+<p>Products bougth: <strong>{{count_prods}}</strong> pieces</p>
+
+<ul id="sio" class="list-line">Poducts associated with this cart:
+    {% for prod in list_prods %}
+        <li class="list-inline-item">{{prod}}</li>
+    {% endfor %}
+</ul>
+
 {% endblock %}
